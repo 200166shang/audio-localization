@@ -1,0 +1,23 @@
+{
+  "skill_name": "tencent-video-localization",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "把这个我有版权的 30 分钟英文访谈转成纯中文音轨。已有英文 SRT，使用腾讯云，尽量五分钟内完成。",
+      "expected_output": "Uses the existing SRT to skip ASR, runs the Tencent-backed pipeline with safe concurrency, and reports absolute output/report paths and elapsed time.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我只有一段英文 m4a，没有字幕。用腾讯云识别、翻译和男声配音，失败后可以续跑。",
+      "expected_output": "Uses Tencent ASR before translation and TTS, preserves the resumable cache, and does not invoke a local inference fallback.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "腾讯云配音中途失败了，帮我安全地重新运行；不要在日志里显示密钥，也不要重复收费已经完成的片段。",
+      "expected_output": "Reruns against the same output directory, relies on content-addressed cache hits, and keeps credentials environment-only and redacted.",
+      "files": []
+    }
+  ]
+}
