@@ -1,6 +1,6 @@
 .DS_Store
 .env
-.venv/
+.venv*/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -9,3 +9,6 @@ dist/
 build/
 *.egg-info/
 artifacts/
+.work/
+localization/
+audio/
