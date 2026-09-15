@@ -41,3 +41,4 @@ def test_stt_passes_requested_asr_model_to_pyvideotrans(tmp_path: Path, monkeypa
 
     model_index = captured.index("--model_name")
     assert captured[model_index + 1] == "qwen3-asr-flash"
+    assert "--quiet" not in captured

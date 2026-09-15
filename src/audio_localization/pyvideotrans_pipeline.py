@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -60,7 +61,7 @@ def localize_package(package: Path) -> LocalizationResult:
         _run_bridge(
             "--task", "stt", "--name", str(source_audio), "--recogn_type", "13",
             "--model_name", asr_model,
-            "--detect_language", "auto", "--output-dir", str(stt_dir), "--quiet",
+            "--detect_language", "auto", "--output-dir", str(stt_dir),
         )
         generated = _single_output(stt_dir, ".srt")
         source_subtitle = _path(package, request["source"]["asr_output"])
@@ -77,7 +78,7 @@ def localize_package(package: Path) -> LocalizationResult:
     _run_bridge(
         "--task", "sts", "--name", str(source_subtitle), "--translate_type", "13",
         "--source_language_code", "auto", "--target_language_code", "zh-cn",
-        "--output-dir", str(sts_dir), "--quiet",
+        "--output-dir", str(sts_dir),
     )
     translated_srt = _single_output(sts_dir, ".srt")
     source_cues = parse_srt(source_subtitle)
@@ -95,7 +96,7 @@ def localize_package(package: Path) -> LocalizationResult:
     _run_bridge(
         "--task", "tts", "--name", str(translated_srt), "--tts_type", "18",
         "--voice_role", voice, "--target_language_code", "zh-cn",
-        "--voice_autorate", "--output-dir", str(tts_dir), "--quiet",
+        "--voice_autorate", "--output-dir", str(tts_dir),
     )
     rendered = _single_output(tts_dir, ".wav")
     timings["tts_seconds"] = time.monotonic() - phase
@@ -216,15 +217,17 @@ def _run_bridge(*arguments: str) -> None:
     try:
         completed = subprocess.run(
             [str(python), str(bridge), *arguments],
-            capture_output=True,
+            stdout=sys.stderr,
+            stderr=sys.stderr,
             text=True,
             timeout=7200,
         )
     except subprocess.TimeoutExpired as exc:
         raise TransientCloudError("pyVideoTrans stage timed out") from exc
     if completed.returncode:
-        detail = (completed.stderr or completed.stdout or "pyVideoTrans failed")[-800:]
-        raise TransientCloudError(detail)
+        raise TransientCloudError(
+            f"pyVideoTrans failed with exit code {completed.returncode}; see streamed logs"
+        )
 
 
 def _single_output(folder: Path, suffix: str) -> Path:
