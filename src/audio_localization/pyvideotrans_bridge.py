@@ -67,7 +67,11 @@ def main() -> int:
         config.params.update(provider_params)
     config.settings["dubbing_thread"] = 1
     config.settings["dubbing_wait"] = 0
-    config.settings["aitrans_thread"] = 20
+    # These compacted cues can contain close to 50 English words each.  A
+    # qwen-mt-turbo may merge or truncate adjacent long SRT cues while still
+    # returning success. Translate one compacted cue per request so every
+    # source timestamp remains represented exactly once.
+    config.settings["aitrans_thread"] = 1
     config.settings["translation_wait"] = 2
     config.settings["retry_nums"] = 3
 
