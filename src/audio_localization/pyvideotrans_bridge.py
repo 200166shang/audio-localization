@@ -67,6 +67,8 @@ def main() -> int:
         config.params.update(provider_params)
     config.settings["dubbing_thread"] = 1
     config.settings["dubbing_wait"] = 0
+    config.settings["aitrans_thread"] = 20
+    config.settings["translation_wait"] = 2
     config.settings["retry_nums"] = 3
 
     import cli
